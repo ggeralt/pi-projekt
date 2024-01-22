@@ -1,0 +1,120 @@
+﻿@model SimpleSocialNetworkShared.RegisterDTO
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<style>
+    body {
+        background: linear-gradient(45deg, rgba(0,0,0,1) 40%, rgba(75,170,329,1) 60%)
+    }
+
+    .form-group {
+        margin-top: 10px;
+    }
+
+    .inputbox {
+        border-bottom: 4px solid #fff;
+    }
+
+    .form-control {
+        height: 50px;
+        background: transparent;
+        border: none;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        outline: none;
+        box-shadow: none;
+        background: transparent;
+        color: #fff;
+    }
+
+    .form-control::placeholder {
+        color: #fff
+    }
+
+    #register {
+        padding: 10vh;
+        background-color: rgba(255, 255, 255, 0.20);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        text-align: center;
+        color: #fff
+    }
+
+    .register-alert {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        text-align: center;
+        color: #fff;
+        border: none;
+    }
+
+    #register-button {
+        width: 100%;
+        border-radius: 25px;
+        background: transparent;
+        color: #fff;
+    }
+</style>
+
+<div class="row" style="margin-top: 18vh">
+    <div class="col-md-3"></div>
+    <div id="register" class="col-md-6">
+        <h2>Register</h2>
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group inputbox">
+                <input asp-for="Email" class="form-control" placeholder="Email" autocomplete="off" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group inputbox">
+                <input asp-for="Username" class="form-control" placeholder="Username" autocomplete="off" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-group inputbox">
+                <input asp-for="Password" class="form-control" placeholder="Password" type="password" autocomplete="off" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group inputbox">
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm password" type="password" autocomplete="off" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-light" id="register-button" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@if (ViewBag.Response != null && ViewBag.Response.IsSuccess == false)
+{
+    <div class="row register-alert" style="display:flex; flex-direction:column; justify-items:center; align-items:center; margin-top: 30px;">
+        <div class="alert register-alert" role="alert">
+            @ViewBag.Response.Message
+        </div>
+    </div>
+}
+else if (ViewBag.Response != null && ViewBag.Response.IsSuccess == true)
+{
+    <div class="row register-alert" style="display:flex; flex-direction:column; justify-items:center; align-items:center; margin-top: 30px;">
+        <div class="alert register-alert" role="alert">
+            @ViewBag.Response.Message
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

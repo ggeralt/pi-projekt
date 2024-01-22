@@ -1,0 +1,199 @@
+﻿@model IEnumerable<SimpleSocialNetworkShared.PostViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+    body {
+        background: linear-gradient(45deg, rgba(0,0,0,1) 40%, rgba(75,170,329,1) 60%);
+        background-attachment: fixed;
+    }
+
+    #post {
+        padding: 2vh;
+        background-color: rgba(255, 255, 255, 0.20);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    #post-button {
+        background-color: dimgray;
+        padding: 20px;
+        border-color: #fff;
+        text-decoration: none;
+        color: #fff;
+    }
+
+    .login-error {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        text-align: center;
+        color: #fff;
+        border: none;
+    }
+
+    .userinfo {
+        font-size: xx-large;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .comment-section {
+        display: none;
+        margin-top: 20px;
+    }
+
+    .form-control {
+        border-bottom: 2px solid #fff;
+        height: 50px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        
+    }
+
+    .inputbox {
+        border-bottom: 4px solid #fff;
+    }
+
+    .form-control:focus {
+        outline: none;
+        box-shadow: none;
+        background: transparent;
+        color: #fff;
+    }
+
+    .form-control::placeholder {
+        color: #fff
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-3"></div>
+            
+            <div class="col-md-6">
+                <div id="post" class="card">
+                    @if (string.IsNullOrEmpty(item.User.ProfilePicture))
+                    {
+                        <span class="userinfo"><i style="font-size: 60px; margin-right: 10px" class="bi bi-person-circle"></i> @Html.ActionLink(item.User.Username, "UserProfile", "Profile", new { id=item.User.Id }, new {style="text-decoration:none; color: #fff;"})</span>
+                    }else
+                    {
+                        <span class="userinfo"><img style="width: 60px; border-radius: 50%; margin-right: 10px" src="@Url.Content(item.User.ProfilePicture)"> @Html.ActionLink(item.User.Username, "UserProfile", "Profile", new { id=item.User.Id }, new {style="text-decoration:none; color: #fff;"})</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(item.MediaPath))
+                    {
+                        <img class="card-img-top" src="@Url.Content(item.MediaPath)" alt="Card image cap">
+                    }
+                    <div class="card-body">
+                        <p class="card-text">@item.Content</p>
+                        Liked: <spam id=@item.Id.ToString() class="card-text">@item.LikeCount</spam><br/>
+                        <input value="Like" id="btnlike" class="btn btn-outline-light" type="button" onclick="BtnLikeClick(@item.Id.ToString())" />
+                        <input value="Comment" id="btnComment" class="btn btn-outline-light" type="button" onclick="BtnCommentClick(@item.Id.ToString())" />
+                        <div id="@("comment_section_" + item.Id.ToString())" class="comment-section">
+                            <div class="row">
+                                <div class="inputbox col-md-9">
+                                    <input id="comment-content" placeholder="Comment" class="form-control" type="text" autocomplete="off" />
+                                </div>
+                                <div class="col-md-3">
+                                    <input value="Add Comment" id="btnAddComment" class="btn btn-outline-light" type="button" onclick="BtnAddCommentClick(@item.Id.ToString(), $('#comment-content').val())" />
+                                </div>
+                            </div>
+
+                            <div id=@("comment_" + item.Id.ToString()) style="margin-top: 20px;">
+                                @if (item.Comments != null)
+                                {
+                                    foreach (var comment in item.Comments)
+                                    {
+                                        <div style="border: solid; border-radius: 10px; padding: 10px; margin-top: 10px; overflow: hidden;">
+                                            @Html.ActionLink(comment.User.Username, "UserProfile", "Profile", new { id=comment.User.Id }, new {style="text-decoration:none; color: #fff;"})
+                                            <p>@comment.Content</p>
+                                            @*@Html.ActionLink("Delete", "DeleteComment", new { commentId=comment.Id}, new {style="text-decoration:none; color: #fff; float: right;"})<br />*@
+                                            <input style="border: none; background: transparent; color: #fff; float: right;" value="Delete" id="btnAddComment" type="button" onclick="BtnDeleteCommentClick(@comment.Id)" />
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        @*@Ajax.ActionLink("Like", "Like", new { id=item.Id }, new { @class = "btn btn-outline-light" })*@
+                        @*@Html.ActionLink("Comment", "Comment", new { id=item.Id }, new { @class = "btn btn-outline-light" })*@
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3"></div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function BtnLikeClick(postId) {
+            $.ajax({
+                type: "PUT",
+                url: "@Url.Action("Like")",
+                dataType: "json",
+                data: { postId: postId },
+                success: function (response) {
+                    $('#' + postId).html(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            })
+        }
+
+        function BtnCommentClick(postId) {
+            $('#comment_section_' + postId).toggle(1000);
+        }
+        //Comment(int postId, string comment)
+        function BtnAddCommentClick(postId, comment) {
+            if(comment !== null && $.trim(comment) !== '') {
+                console.log(comment);
+                $.ajax({
+                    type: "PUT",
+                    url: "@Url.Action("Comment")",
+                    dataType: "json",
+                    data: { postId: postId, comment: comment },
+                    success: function (response) {
+
+                        console.log(response.content);
+                        console.log(response.user.id);
+                        console.log(response.user.username);
+                        $('#comment_' + postId).append(`<a href="/Profile/UserProfile/${response.user.id}" style="text-decoration:none; color: #fff;">${response.user.username}</a><p>${response.content}</p>`);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                })
+            } else {
+                console.log("PRAZNO");
+            }
+        }
+
+        function BtnDeleteCommentClick(commentId) {
+            $.ajax({
+                type: "DELETE",
+                url: "@Url.Action("DeleteComment")",
+                dataType: "json",
+                data: { commentId: commentId },
+                success: function (response) {
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            })
+        }
+    </script>
+}

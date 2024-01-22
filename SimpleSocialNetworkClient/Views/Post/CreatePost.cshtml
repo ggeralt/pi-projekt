@@ -1,0 +1,131 @@
+﻿@model SimpleSocialNetworkShared.PostViewModel
+
+@{
+    ViewData["Title"] = "CreatePost";
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+<style>
+    body {
+        background: linear-gradient(45deg, rgba(0,0,0,1) 40%, rgba(75,170,329,1) 60%)
+    }
+
+    .form-group {
+        margin-top: 10px;
+    }
+
+    #createpost {
+        padding: 10vh;
+        background-color: rgba(255, 255, 255, 0.20);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        text-align: center;
+        color: #fff
+    }
+
+    #create-post-button {
+        width: 100%;
+        border-radius: 25px;
+        background: transparent;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        outline: none;
+        box-shadow: none;
+        background: transparent;
+        color: #fff;
+    }
+
+    .form-control::placeholder {
+        color: #fff
+    }
+
+    .form-control {
+        border-bottom: 2px solid #fff;
+        height: 50px;
+        background: transparent;
+        border: none;
+        color: #fff;
+    }
+
+    .inputbox {
+        border-bottom: 4px solid #fff;
+    }
+
+    .file-input::-webkit-file-upload-button {
+        background: #fff;
+        border-radius: 25px;
+        border-color: #fff;
+        color: darkgray;
+        cursor: pointer;
+    }
+
+    .login-error {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        text-align: center;
+        color: #fff;
+        border: none;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-3"></div>
+        
+        <div id="createpost" class="col-md-6">
+            <h2>
+                Create Post<i class="bi bi-file-earmark-post"></i>
+            </h2>
+            <form enctype="multipart/form-data" asp-action="CreatePost">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group inputbox">
+                    <input asp-for="Content" class="form-control" placeholder="Description" autocomplete="off" />
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+                @*<div class="form-group">
+                    <label asp-for="MediaPath" class="control-label"></label>
+                    <input asp-for="MediaPath" class="form-control" />
+                    <span asp-validation-for="MediaPath" class="text-danger"></span>
+                </div>*@
+                <div class="form-group inputbox">
+                    <input asp-for="MediaFile" class="form-control file-input" />
+                    <span asp-validation-for="MediaFile" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input id="create-post-button" type="submit" value="Create" class="btn btn-outline-light" />
+                </div>
+            </form>
+        </div>
+    
+        <div class="col-md-3"></div>
+    </div>
+</div>
+
+@if (ViewBag.Response != null && ViewBag.Response.IsSuccess == false)
+{
+    <div class="row login-error" style="display:flex; flex-direction:column; justify-items:center; align-items:center; margin-top: 30px;">
+        <div class="alert login-error" role="alert">
+            @ViewBag.Response.Message
+        </div>
+    </div>
+}
+else if (ViewBag.Response != null && ViewBag.Response.IsSuccess == true)
+{
+    <div class="row login-error" style="display:flex; flex-direction:column; justify-items:center; align-items:center; margin-top: 30px;">
+        <div class="alert login-error" role="alert">
+            @ViewBag.Response.Message
+        </div>
+    </div>
+}
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

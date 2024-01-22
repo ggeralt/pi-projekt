@@ -1,0 +1,135 @@
+﻿@model SimpleSocialNetworkShared.ApplicationUserViewModel
+
+@{
+    ViewData["Title"] = "UserProfile";
+}
+
+<style>
+    body {
+        background: linear-gradient(45deg, rgba(0,0,0,1) 40%, rgba(75,170,329,1) 60%);
+        background-attachment: fixed;
+    }
+
+    .form-group {
+        margin-top: 10px;
+    }
+
+    .inputbox {
+        border-bottom: 4px solid #fff;
+    }
+
+    .form-control {
+        border-bottom: 2px solid #fff;
+        height: 50px;
+        background: transparent;
+        border: none;
+        color: #fff;
+    }
+
+    .form-control:focus {
+        outline: none;
+        box-shadow: none;
+        background: transparent;
+        color: #fff;
+    }
+
+    .form-control::placeholder {
+        color: #fff
+    }
+
+    #login {
+        padding: 10vh;
+        background-color: rgba(255, 255, 255, 0.20);
+        border-radius: 25px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(7.7px);
+        text-align: center;
+        color: #fff
+    }
+
+    #login-button {
+        width: 100%;
+        border-radius: 25px;
+        background: transparent;
+        color: #fff;
+    }
+
+    .file-input::-webkit-file-upload-button {
+        background: #fff;
+        border-radius: 25px;
+        border-color: #fff;
+        color: darkgray;
+        cursor: pointer;
+    }
+</style>
+
+<div class="container" style="margin-top: 20vh;">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div id="login" class="col-md-10">
+            <div style="height: 40px">
+                @using (Html.BeginForm("DeleteProfile", "Profile", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <input type="hidden" value="@Model.Id" name="userId" class="file-input" />
+                    <input type="submit" value="Delete Profile" class="btn btn-outline-light" style="float: right;"/>
+                }
+            </div>
+            <div>
+                @if (Model.ProfilePicture != null)
+                {
+                    <img style="width: 8rem; border-radius: 50%; margin-right: 10px" src="@Url.Content("~/" + Model.ProfilePicture)">
+                }else
+                {
+                    <i style="font-size: 70px; margin-right: 10px" class="bi bi-person-circle"></i>
+                }
+                <h2>@Model.Username</h2>
+            </div>
+            <div class="form-group">
+                @using (Html.BeginForm("ChangeProfileImage", "Profile", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <input type="file" name="file" class="file-input" accept="image/jpeg, image/png, image/jpg" />
+                    <input type="hidden" value="@Model.Id" name="userId" class="file-input" />
+                    <input type="submit" value="Upload" class="btn btn-outline-light"/>
+                }
+            </div>
+            <div class="container" style="margin-top: 15px;">
+                <div class="row">
+                    @foreach (var post in Model.Posts)
+                    {
+                        <div class="col-md-4">
+                            <div>
+                                @if (!string.IsNullOrEmpty(post.MediaPath))
+                                {
+                                    <img class="card-img-top" src="@Url.Content("~/" + post.MediaPath)" alt="Card image cap">
+                                }
+                                <p>@post.Content</p>
+                            </div>
+                            @Html.ActionLink("Edit", "Post", "Post", new {  postId = post.Id }, new { @class="btn btn-outline-light" })
+                            <input class="btn btn-outline-light" value="Delete" id="btnAddComment" type="button" onclick="BtnDeletePostClick(@post.Id)" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function BtnDeletePostClick(postId) {
+            debugger;
+            $.ajax({
+                type: "DELETE",
+                url: `@Url.Action("DeletePost", "Post")?postId=${postId}`,
+                dataType: "json",
+                success: function (response) {
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            })
+        }
+    </script>
+}
